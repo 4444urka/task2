@@ -23,7 +23,7 @@ export default function SignUp() : JSX.Element {
     const { handleSubmit, control } = useForm<UserInfo>();
     const onSubmit: SubmitHandler<UserInfo> = (data) => console.log(data);
     const { errors } = useFormState({control});
-    console.log(errors);
+    
   return (
         <Container component="main" maxWidth="xs" sx={{justifyContent: 'center', display: 'flex'}}>
             <Box className='blank'>
