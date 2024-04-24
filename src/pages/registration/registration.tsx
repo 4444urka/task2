@@ -7,20 +7,23 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { NavLink } from 'react-router-dom';
+import { Controller, useForm, SubmitHandler, useFormState } from 'react-hook-form';
 
-export default function SignUp() {
-    
-    const [login, setLogin] = React.useState('');
-    const [companyName, setCompanyName] = React.useState('');
-    const [phoneNumber, setPhoneNumber] = React.useState('');
-    const [password, setPassword] = React.useState('');
+import { companyNameValidation, loginValidation, passwordValidation, phoneNumberValidation } from './validation';
 
-    function tryToSubmitUserData() {
-        const phoneNumberRegex : RegExp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
-        
-        }
-    
+type UserInfo = {
+    login: string;
+    companyName: string;
+    phoneNumber: string;
+    password: string;
+}
 
+export default function SignUp() : JSX.Element {
+
+    const { handleSubmit, control } = useForm<UserInfo>();
+    const onSubmit: SubmitHandler<UserInfo> = (data) => console.log(data);
+    const { errors } = useFormState({control});
+    console.log(errors);
   return (
         <Container component="main" maxWidth="xs" sx={{justifyContent: 'center', display: 'flex'}}>
             <Box className='blank'>
@@ -35,61 +38,83 @@ export default function SignUp() {
             <Typography component="h1" variant="h5">
                 Регистрация
             </Typography>
-            <Box component="form" noValidate sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                    value={login}
-                    onChange={(e) => setLogin(e.target.value)}
-                    autoComplete="given-name"
-                    name="Логин"
-                    required
-                    fullWidth
-                    id="Login"
-                    label="Логин"
-                    autoFocus
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    required
-                    fullWidth
-                    id="CompanyName"
-                    label="Название компании"
-                    name="Название компании"
-                    autoComplete="family-name"
-                    />
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Grid container spacing={2} sx={{mt: 3}}>
+                <Grid item xs={12}>
+                    <Controller
+                    rules={loginValidation}
+                    control={control}
+                    name='login'
+                    render={({ field }) => (
+                        <TextField
+                            onChange={(e) => field.onChange(e)}
+                            value={field.value}
+                            autoComplete="given-name"
+                            name="Логин"
+                            required
+                            fullWidth
+                            label="Логин"
+                            autoFocus
+                            helperText={errors.login?.message}
+                            error={!!errors.login?.message}
+                        />)} />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
-                    fullWidth
-                    label="Номер телефона"
-                    name="Номер телефона"
-                    id="PhoneNumber"
-                    type="tel"
-                    />
+                    <Controller
+                        rules={companyNameValidation}
+                        control={control}
+                        name='companyName'
+                        render={({ field }) => (
+                            <TextField
+                                onChange={(e) => field.onChange(e)}
+                                value={field.value}
+                                required
+                                fullWidth
+                                label="Название компании"
+                                name="Название компании"
+                                helperText={errors.companyName?.message}
+                                error={!!errors.companyName?.message}
+                            />)}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    fullWidth
-                    name="Пароль"
-                    label="Пароль"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    />
+                    <Controller
+                        rules={phoneNumberValidation}
+                        control={control}
+                        name='phoneNumber'
+                        render={({ field }) => (
+                            <TextField
+                                onChange={(e) => field.onChange(e)}
+                                value={field.value}
+                                required
+                                fullWidth
+                                label="Номер телефона"
+                                name="Номер телефона"
+                                type="tel"
+                                helperText={errors.phoneNumber?.message}
+                                error={!!errors.phoneNumber?.message}
+                            />)}/>
+                </Grid>
+                <Grid item xs={12}>
+                    <Controller
+                        rules={passwordValidation}
+                        control={control}
+                        name='password'
+                        render={({ field }) => (
+                            <TextField
+                                onChange={(e) => field.onChange(e)}
+                                value={field.value}
+                                required
+                                fullWidth
+                                name="Пароль"
+                                label="Пароль"
+                                type="password"
+                                autoComplete="new-password"
+                                helperText={errors.password?.message}
+                                error={!!errors.password?.message}
+                            />)}/>
                 </Grid>
                 </Grid>
                 <Button
-                onClick={tryToSubmitUserData}
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -106,7 +131,7 @@ export default function SignUp() {
                     </NavLink>
                 </Grid>
                 </Grid>
-            </Box>
+            </form>
             </Box>
             </Box>
         </Container>
