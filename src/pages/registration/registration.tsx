@@ -9,19 +9,15 @@ import Container from '@mui/material/Container';
 import { NavLink } from 'react-router-dom';
 import { Controller, useForm, SubmitHandler, useFormState } from 'react-hook-form';
 
-import { companyNameValidation, loginValidation, passwordValidation, phoneNumberValidation } from './validation';
+import { registerUser } from '../../services/api';
 
-type UserInfo = {
-    login: string;
-    companyName: string;
-    phoneNumber: string;
-    password: string;
-}
+import { companyNameValidation, loginValidation, passwordValidation, phoneNumberValidation } from './validation';
+import { TUserInfo } from '../../types';
 
 export default function SignUp() : JSX.Element {
 
-    const { handleSubmit, control } = useForm<UserInfo>();
-    const onSubmit: SubmitHandler<UserInfo> = (data) => console.log(data);
+    const { handleSubmit, control } = useForm<TUserInfo>();
+    const onSubmit: SubmitHandler<TUserInfo> = (data) => registerUser(data);
     const { errors } = useFormState({control});
     
   return (
@@ -44,7 +40,7 @@ export default function SignUp() : JSX.Element {
                     <Controller
                     rules={loginValidation}
                     control={control}
-                    name='login'
+                    name='name'
                     render={({ field }) => (
                         <TextField
                             onChange={(e) => field.onChange(e)}
@@ -55,8 +51,8 @@ export default function SignUp() : JSX.Element {
                             fullWidth
                             label="Логин"
                             autoFocus
-                            helperText={errors.login?.message}
-                            error={!!errors.login?.message}
+                            helperText={errors.name?.message}
+                            error={!!errors.name?.message}
                         />)} />
                 </Grid>
                 <Grid item xs={12}>
