@@ -6,18 +6,47 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { NavLink } from 'react-router-dom';
 import { Controller, useForm, SubmitHandler, useFormState } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
-import { registerUser } from '../../services/api';
+import { registerUser } from '../../http/api';
 
 import { companyNameValidation, loginValidation, passwordValidation, phoneNumberValidation } from './validation';
-import { TUserInfo } from '../../types';
+import { TUserRegistrationInfo } from '../../types';
+import { makeUserBoss } from './makeUserBoss';
 
-export default function SignUp() : JSX.Element {
+export default function SignUp() {
 
-    const { handleSubmit, control } = useForm<TUserInfo>();
-    const onSubmit: SubmitHandler<TUserInfo> = (data) => registerUser(data);
+    const { handleSubmit, control } = useForm<TUserRegistrationInfo>({
+        defaultValues: {
+            name: '',
+            companyName: '',
+            phoneNumber: '',
+            password: '',
+            isBoss: false
+        }
+    });
+    const navigate = useNavigate();
+        const onSubmit: SubmitHandler<TUserRegistrationInfo> = async (data) => {
+            try {
+                const response = await registerUser(data);
+
+                if (response.data.success)
+                    alert('Пользователь успешно зарегистрирован');
+                    navigate('/SingIn');
+                    makeUserBoss(data);
+            } catch (error: any) {
+                if (error.response.status === 500) {
+                    alert('Такой пользователь уже существует');
+                }
+                else
+                    alert('Ошибка сервера');
+            }
+    }
+
     const { errors } = useFormState({control});
     
   return (
@@ -72,6 +101,15 @@ export default function SignUp() : JSX.Element {
                                 error={!!errors.companyName?.message}
                             />)}/>
                 </Grid>
+                <Grid container justifyContent="flex-end">
+                <Grid item>
+                    <NavLink to="/companyRegister">
+                        <Link variant="body2">
+                            Нет компании? Создайте
+                        </Link>
+                    </NavLink>
+                </Grid>
+                </Grid>
                 <Grid item xs={12}>
                     <Controller
                         rules={phoneNumberValidation}
@@ -110,6 +148,24 @@ export default function SignUp() : JSX.Element {
                             />)}/>
                 </Grid>
                 </Grid>
+                <Grid item xs={12}>
+                <Controller
+                    control={control}
+                    name='isBoss'
+                    render={({ field }) => (
+                        <FormControlLabel
+                        control={
+                            <Checkbox
+                            color="primary"
+                            onChange={(e) => field.onChange(e)}
+                            checked={field.value}
+                            />
+                        }
+                        label="Я босс"
+                        />
+                    )}
+                    />
+              </Grid>
                 <Button
                 type="submit"
                 fullWidth
